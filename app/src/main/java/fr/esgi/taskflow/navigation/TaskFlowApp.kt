@@ -1,6 +1,7 @@
 package fr.esgi.taskflow.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -14,11 +15,14 @@ import fr.esgi.taskflow.ui.login.LoginScreen
 import fr.esgi.taskflow.ui.tasks.CreateTaskScreen
 import fr.esgi.taskflow.ui.tasks.TaskListScreen
 import fr.esgi.taskflow.ui.tasks.TaskViewModel
+import fr.esgi.taskflow.ui.tasks.TaskViewModelFactory
+import fr.esgi.taskflow.data.repository.InMemoryTaskRepository
 
 @Composable
 fun TaskFlowApp() {
     val navController = rememberNavController()
-    val taskViewModel: TaskViewModel = viewModel()
+    val repository = remember { InMemoryTaskRepository() }
+    val taskViewModel: TaskViewModel = viewModel(factory = remember(repository) { TaskViewModelFactory(repository) })
     val tasks = taskViewModel.uiState.collectAsStateWithLifecycle().value.tasks
     val openTask: (Int) -> Unit = { taskId -> navController.navigate(Destinations.detail(taskId)) }
     val selectTab: (HomeTab) -> Unit = { tab ->
